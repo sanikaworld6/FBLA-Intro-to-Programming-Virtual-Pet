@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Virtual Pet - Setup </title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main container for setup page -->
+    <div class="container">
+        <!-- Page title -->
+        <h1>Create Your Virtual Pet</h1>
+        
+        <!-- Pet name input section -->
+        <div class="input-section">
+            <label for="petName">Enter Your Pet's Name:</label>
+            <input 
+                type="text" 
+                id="petName" 
+                placeholder="Type pet name here..."
+            >
+        </div>
+
+        <!-- Pet type selection section -->
+        <div class="pet-selection">
+            <p>Choose Your Pet Type:</p>
+            
+            <!-- Three buttons for pet selection -->
+            <button class="pet-btn" id="dogBtn" onclick="selectPet('dog')">
+                Dog
+            </button>
+            
+            <button class="pet-btn" id="catBtn" onclick="selectPet('cat')">
+                Cat
+            </button>
+            
+            <button class="pet-btn" id="bunnyBtn" onclick="selectPet('bunny')">
+                Bunny
+            </button>
+        </div>
+
+        <!-- Next button to go to home page -->
+        <button class="next-btn" id="nextBtn" onclick="goToHome()">
+            Next →
+        </button>
+    </div>
+
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Pet - Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Virtual Pet</h1>
+    
+    <!-- Total box -->
+    <div class="total-box">
+        <div id="moneyDisplay">Total Balance: $100</div>
+    </div>
+    
+    <div class="home-container">
+        <!-- Left side buttons -->
+        <div class="side-buttons">
+            <div class="button-with-progress">
+                <a href="Play.html" class="action-btn">Play</a>
+                <div class="button-progress-bar">
+                    <div class="button-progress-fill" id="playProgressFill"></div>
+                    <span class="button-progress-text" id="playProgressText">5/10</span>
+                </div>
+            </div>
+            <div class="button-with-progress">
+                <a href="Rest.html" class="action-btn">Rest</a>
+                <div class="button-progress-bar">
+                    <div class="button-progress-fill" id="restProgressFill"></div>
+                    <span class="button-progress-text" id="restProgressText">5/10</span>
+                </div>
+            </div>
+            <div class="button-with-progress">
+                <a href="Vet.html" class="action-btn">Health (-$50)</a>
+                <div class="button-progress-bar">
+                    <div class="button-progress-fill" id="vetProgressFill"></div>
+                    <span class="button-progress-text" id="vetProgressText">5/10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center pet name box -->
+        <div class="center-box">
+            <div class="pet-name-box">
+                <h2 id="petNameDisplay">Your Pet</h2>
+                <img id="petImage" src="images/normal_dog.png" alt="Your pet">
+                <div id="speechBubble" class="speech-bubble" style="display: none;"></div>
+            </div>
+        </div>  
+
+        <!-- Right side buttons -->
+        <div class="side-buttons">
+            <div class="button-with-progress">
+                <a href="Clean.html" class="action-btn">Clean (-$5)</a>
+                <div class="button-progress-bar">
+                    <div class="button-progress-fill" id="cleanProgressFill"></div>
+                    <span class="button-progress-text" id="cleanProgressText">5/10</span>
+                </div>
+            </div>
+            <div class="button-with-progress">
+                <a href="Feed.html" class="action-btn">Feed (-$10)</a>
+                <div class="button-progress-bar">
+                    <div class="button-progress-fill" id="feedProgressFill"></div>
+                    <span class="button-progress-text" id="feedProgressText">5/10</span>
+                </div>
+            </div>
+            <div class="button-with-progress">
+                <a href="Competition.html" class="action-btn" style="display: flex; align-items: center; justify-content: center; border-radius: 20px;">Competition (+$100)</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
