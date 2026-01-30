@@ -18,10 +18,9 @@
         <!-- Left side buttons -->
         <div class="side-buttons">
             <div class="button-with-progress">
-                <a href="Play.html" class="action-btn">Play</a>
+                <a href="Play.html" class="action-btn">Play (<span id="playProgressText">${pet.play}/10</span>)</a>
                 <div class="button-progress-bar">
-                    <div class="button-progress-fill" id="playProgressFill"></div>
-                    <span class="button-progress-text" id="playProgressText">5/10</span>
+                    <div class="button-progress-fill" id="playProgressFill" style="width: ${pet.play * 10}%"></div>
                 </div>
             </div>
             <div class="button-with-progress">
