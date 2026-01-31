@@ -100,6 +100,10 @@
             cursor: not-allowed;
             border-color: transparent;
         }
+
+        .buy-btn.insufficient-funds {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -112,21 +116,21 @@
                 <div class="toy-rectangle">
                     <div class="toy-placeholder">Toy 1<br>Coming Soon</div>
                 </div>
-                <button class="buy-btn" onclick="buyToy(1, 20)">Buy - $20</button>
+                <button class="buy-btn" data-toy="1" data-price="20" onclick="buyToy(1, 20)">Buy - $20</button>
             </div>
 
             <div class="toy-item">
                 <div class="toy-rectangle">
                     <div class="toy-placeholder">Toy 2<br>Coming Soon</div>
                 </div>
-                <button class="buy-btn" onclick="buyToy(2, 25)">Buy - $25</button>
+                <button class="buy-btn" data-toy="2" data-price="25" onclick="buyToy(2, 25)">Buy - $25</button>
             </div>
 
             <div class="toy-item">
                 <div class="toy-rectangle">
                     <div class="toy-placeholder">Toy 3<br>Coming Soon</div>
                 </div>
-                <button class="buy-btn" onclick="buyToy(3, 30)">Buy - $30</button>
+                <button class="buy-btn" data-toy="3" data-price="30" onclick="buyToy(3, 30)">Buy - $30</button>
             </div>
         </div>
 
@@ -136,21 +140,21 @@
                 <div class="toy-rectangle">
                     <div class="toy-placeholder">Toy 4<br>Coming Soon</div>
                 </div>
-                <button class="buy-btn" onclick="buyToy(4, 35)">Buy - $35</button>
+                <button class="buy-btn" data-toy="4" data-price="35" onclick="buyToy(4, 35)">Buy - $35</button>
             </div>
 
             <div class="toy-item">
                 <div class="toy-rectangle">
                     <div class="toy-placeholder">Toy 5<br>Coming Soon</div>
                 </div>
-                <button class="buy-btn" onclick="buyToy(5, 40)">Buy - $40</button>
+                <button class="buy-btn" data-toy="5" data-price="40" onclick="buyToy(5, 40)">Buy - $40</button>
             </div>
 
             <div class="toy-item">
                 <div class="toy-rectangle">
                     <div class="toy-placeholder">Toy 6<br>Coming Soon</div>
                 </div>
-                <button class="buy-btn" onclick="buyToy(6, 45)">Buy - $45</button>
+                <button class="buy-btn" data-toy="6" data-price="45" onclick="buyToy(6, 45)">Buy - $45</button>
             </div>
         </div>
     </div>
@@ -185,17 +189,13 @@
             const buttons = document.querySelectorAll('.buy-btn');
             
             buttons.forEach(button => {
-                const onclick = button.getAttribute('onclick');
-                const priceMatch = onclick.match(/buyToy\(\d+,\s*(\d+)\)/);
-                if (priceMatch) {
-                    const price = parseInt(priceMatch[1]);
-                    if (state.money < price) {
-                        button.disabled = true;
-                        button.style.opacity = '0.6';
-                    } else {
-                        button.disabled = false;
-                        button.style.opacity = '1';
-                    }
+                const price = parseInt(button.dataset.price);
+                if (state.money < price) {
+                    button.disabled = true;
+                    button.classList.add('insufficient-funds');
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('insufficient-funds');
                 }
             });
         }
