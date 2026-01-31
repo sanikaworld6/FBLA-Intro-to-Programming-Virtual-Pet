@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Help Center - Q & A</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main container for the Q&A page -->
+    <div class="qa-container">
+        <!-- Q&A box that holds all content -->
+        <div class="qa-box">
+            <!-- Page title -->
+            <h1>Pet Help Center</h1>
+            
+            <!-- Input section for user to type their question -->
+            <div class="qa-input-group">
+                <label for="questionInput">Ask a question about your pet:</label>
+                <input 
+                    type="text" 
+                    id="questionInput" 
+                    placeholder="E.g., How do I feed my pet? What does playing do?"
+                >
+            </div>
+            
+            <!-- Button group with Ask and Home buttons -->
+            <div class="qa-button-group">
+                <button class="qa-ask-btn" onclick="askQuestion()">Ask</button>
+                <a href="Home.html" class="qa-back-btn">Home</a>
+            </div>
+            
+            <!-- Answer display box - shows responses to user questions -->
+            <div class="qa-answer-box" id="answerBox">
+                Ask a question to get started!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // Q&A DATABASE - Contains all questions and answers
+        // ============================================================
+        // Each category has keywords that match user questions
+        // and an answer that will be displayed when keywords are found
+        
+        const qaDatabase = {
+            // Feeding information
+            feed: {
+                keywords: ['feed', 'food', 'hunger', 'eat', 'eating'],
+                answer: '🍖 Feeding your pet improves its hunger stat! Each feeding costs $10 and increases the food stat by 2 points. A well-fed pet is a happy pet! Feed your pet regularly to keep it satisfied.'
+            },
+            // Playing information
+            play: {
+                keywords: ['play', 'game', 'fun', 'happy', 'happiness', 'exercise'],
+                answer: '🎮 Playing with your pet increases happiness and makes it more active! However, playing decreases the rest stat (energy). Each play session is free but your pet will become tired, so make sure it gets enough rest afterward.'
+            },
+            // Rest and sleep information
+            rest: {
+                keywords: ['rest', 'sleep', 'tired', 'energy', 'sleepy'],
+                answer: '😴 Resting helps restore your pet\'s energy! Each rest action is free and increases the rest stat by 3 points. A well-rested pet will have more energy for playing and other activities. Rest is essential for your pet\'s well-being.'
+            },
+            // Veterinary care information
+            vet: {
+                keywords: ['vet', 'health', 'doctor', 'sick', 'ill', 'medical', 'checkup'],
+                answer: '⚕️ Taking your pet to the vet improves its health! Each visit costs $50 and increases the health stat by 4 points. Regular vet visits keep your pet healthy and prevent illness. Don\'t skip those health checkups!'
+            },
+            // Cleaning information
+            clean: {
+                keywords: ['clean', 'dirty', 'bath', 'wash', 'hygiene', 'shower', 'cleanliness'],
+                answer: '🛁 Cleaning your pet keeps it fresh and happy! Each cleaning costs $5 and increases the cleanliness stat by 2 points. Regular baths prevent your pet from getting too dirty and maintain its overall well-being.'
+            },
+            // Pet mood information
+            mood: {
+                keywords: ['sad', 'happy', 'mood', 'emotion', 'feeling', 'spirit'],
+                answer: '😊 Your pet\'s mood depends on its overall stats! A pet with high happiness, health, hunger, rest, and cleanliness will be happy. To improve your pet\'s mood, feed it, play with it, keep it clean, and make sure it gets rest. A well-cared-for pet is a happy pet!'
+            },
+            // Money and economy information
+            money: {
+                keywords: ['money', 'cost', 'price', 'afford', 'balance', 'dollar', '$', 'expensive'],
+                answer: '💰 You start with $100! Different actions have different costs: Feeding costs $10, Cleaning costs $5, and Vet visits cost $50. Playing and Resting are free! Participate in the Competition to earn extra money!'
+            },
+            // Competition information
+            competition: {
+                keywords: ['competition', 'compete', 'contest', 'race', 'win', 'earn', 'prize', 'tournament'],
+                answer: '🏆 Compete with your pet to earn extra money! Winning competitions rewards you with +$100. Your pet needs good stats to perform well in competitions. Train your pet by keeping all stats high for the best chance of winning!'
+            },
+            // Pet stats information
+            stats: {
+                keywords: ['stat', 'status', 'level', 'meter', 'bar', 'progress'],
+                answer: '📊 Your pet has several important stats: Food, Health, Play, Rest, and Cleanliness. Each stat ranges from 0 to 10. Stats naturally decrease over time, so you need to take actions to keep them up. Better stats mean a happier, healthier pet!'
+            }
+        };
+
+        // ============================================================
+        // MAIN FUNCTION - Processes user questions and finds answers
+        // ============================================================
+        
+        // Function to ask a question
+        function askQuestion() {
+            // Get the input element and answer display box
+            const questionInput = document.getElementById('questionInput');
+            const answerBox = document.getElementById('answerBox');
+            
+            // Get the user's question and convert to lowercase for easier matching
+            const question = questionInput.value.toLowerCase().trim();
+
+            // If input is empty, show an error message
+            if (question === '') {
+                answerBox.textContent = 'Please enter a question!';
+                answerBox.classList.add('active');
+                return;
+            }
+
+            // Search through the Q&A database to find a matching answer
+            let foundAnswer = null;
+
+            // Loop through each category in the database
+            for (const category in qaDatabase) {
+                // Get the keywords for this category
+                const keywords = qaDatabase[category].keywords;
+                
+                // Check if any keyword is found in the user's question
+                if (keywords.some(keyword => question.includes(keyword))) {
+                    // If a keyword matches, get the answer for this category
+                    foundAnswer = qaDatabase[category].answer;
+                    break; // Stop searching since we found a match
+                }
+            }
+
+            // Display the answer or a helpful default message
+            if (foundAnswer) {
+                // Show the found answer
+                answerBox.textContent = foundAnswer;
+                answerBox.classList.add('active');
+            } else {
+                // Show suggestions if no keywords matched
+                answerBox.textContent = 'Try asking about: feeding, playing, resting, cleaning, the vet, your pet\'s mood, money, competitions, or stats!';
+                answerBox.classList.add('active');
+            }
+
+            // Clear the input box for the next question
+            questionInput.value = '';
+            
+            // Focus back on the input box so user can type again
+            questionInput.focus();
+        }
+
+        // ============================================================
+        // EVENT LISTENERS - Allow Enter key to submit questions
+        // ============================================================
+        
+        // Allow user to press Enter instead of clicking the Ask button
+        document.getElementById('questionInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                askQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
