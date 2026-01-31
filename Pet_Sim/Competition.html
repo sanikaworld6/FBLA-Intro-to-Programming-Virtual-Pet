@@ -8,17 +8,50 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Create center box to hold image -->
-    <div class="page-container">
-        <div class="content-box">
-            <!-- insert image -->
-            <img id="petImage" src="images/normal_dog.png" alt="Your pet">
+    <!-- Game container -->
+    <div class="competition-container">
+        <!-- Pre-game state with pet image and compete button -->
+        <div id="preGameState" class="pre-game-state">
+            <div class="page-container">
+                <div class="content-box">
+                    <!-- insert image -->
+                    <img id="petImage" src="images/normal_dog.png" alt="Your pet">
+                </div>
+            </div>
+            <!-- Create the competition button -->
+            <button id="competeBtn" class="action-title-btn" style="border-radius: 20px;">Compete</button>
+        </div>
+
+        <!-- Game state with canvas and controls -->
+        <div id="gameState" class="game-state" style="display: none;">
+            <div class="game-info">
+                <h2>Racing Game</h2>
+                <div class="score-display">Score: <span id="gameScore">0</span></div>
+            </div>
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+            <div class="game-controls">
+                <p>Press SPACEBAR or CLICK to jump!</p>
+            </div>
+        </div>
+
+        <!-- Game over state with results -->
+        <div id="gameOverState" class="game-over-state" style="display: none;">
+            <div class="game-over-content">
+                <h2>Game Over!</h2>
+                <div class="game-results">
+                    <p id="finalScore">Final Score: 0</p>
+                    <p id="moneyEarned">Money Earned: $0</p>
+                </div>
+                <div class="game-over-buttons">
+                    <button id="playAgainBtn" class="game-btn">Play Again</button>
+                    <button id="returnHomeBtn" class="game-btn">Return Home</button>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Create the competition button -->
-    <button class="action-title-btn" style="border-radius: 20px;">Compete</button>
-    <!-- Link the hoe page by creating a home button -->
-    <a href="Home.html" class="home-btn">Home</a>
+
+    <!-- Link the home page by creating a home button -->
+    <a href="Home.html" class="home-btn" id="homeBtn">Home</a>
     <!-- Connect this page to script.js to program the functionalities -->
     <script src="script.js"></script>
 </body>
