@@ -1,0 +1,323 @@
+/* ============================================================ */
+/* FINAL ACHIEVEMENT REPORT STYLES */
+/* ============================================================ */
+
+.report-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.report-title {
+    text-align: center;
+    font-size: 48px;
+    color: #667eea;
+    margin-bottom: 40px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 4px solid #667eea;
+    padding-bottom: 20px;
+}
+
+/* Section Styling */
+.report-section {
+    margin-bottom: 40px;
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border-left: 6px solid #667eea;
+}
+
+.section-title {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Pet Information Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #555;
+    font-size: 18px;
+}
+
+.info-value {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 18px;
+}
+
+/* Achievement Badges */
+.badges-earned {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+
+.badge-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.badge-earned {
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.stat-label {
+    font-weight: 600;
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 24px;
+}
+
+/* Gameplay Summary Grid */
+.gameplay-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.gameplay-column {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.column-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+/* Transaction Log */
+.transaction-log {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.transaction-list {
+    padding-left: 25px;
+    margin: 0;
+}
+
+.transaction-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 16px;
+}
+
+.transaction-list li:last-child {
+    border-bottom: none;
+}
+
+/* Action Summary Table */
+.action-summary {
+    overflow-x: auto;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.summary-table th {
+    background-color: #667eea;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.summary-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 16px;
+}
+
+.summary-table tr:hover {
+    background-color: #f0f0f0;
+}
+
+.no-data {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Financial Summary */
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.financial-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.financial-item.highlight {
+    border: 3px solid #667eea;
+    background-color: #f0f4ff;
+}
+
+.financial-label {
+    font-weight: 600;
+    color: #555;
+    font-size: 18px;
+}
+
+.financial-value {
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.financial-value.positive {
+    color: #4caf50;
+}
+
+.financial-value.negative {
+    color: #f44336;
+}
+
+/* Outcome Section */
+.outcome-section {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border-left: 6px solid #ffa500;
+}
+
+.outcome-box {
+    text-align: center;
+    padding: 20px;
+}
+
+.outcome-title {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.outcome-message {
+    font-size: 24px;
+    color: #555;
+    font-weight: 600;
+}
+
+/* Play Again Button */
+.report-actions {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.play-again-btn {
+    display: inline-block;
+    padding: 18px 60px;
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.play-again-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+}
+
+.play-again-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .report-container {
+        padding: 20px;
+        margin: 20px;
+    }
+    
+    .report-title {
+        font-size: 32px;
+    }
+    
+    .info-grid,
+    .stats-grid,
+    .gameplay-grid,
+    .financial-grid {
+        grid-template-columns: 1fr;
+    }
+}

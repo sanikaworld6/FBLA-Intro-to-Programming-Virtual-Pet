@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Pet - Final Achievement Report</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="end-report-styles.css">
+</head>
+<body>
+    <div class="report-container">
+        <h1 class="report-title">Virtual Pet – Final Achievement Report</h1>
+        
+        <!-- Pet Information Section -->
+        <section class="report-section">
+            <h2 class="section-title">Pet Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Pet Name:</span>
+                    <span class="info-value" id="reportPetName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Pet Type:</span>
+                    <span class="info-value" id="reportPetType">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievement Summary Section -->
+        <section class="report-section">
+            <h2 class="section-title">Achievement Summary</h2>
+            <div class="badges-earned" id="badgesEarnedList"></div>
+        </section>
+
+        <!-- Final Pet Stats Section -->
+        <section class="report-section">
+            <h2 class="section-title">Final Pet Stats</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Feed:</span>
+                    <span class="stat-value" id="statFeed">0/10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Play:</span>
+                    <span class="stat-value" id="statPlay">0/10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Health:</span>
+                    <span class="stat-value" id="statHealth">0/10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Clean:</span>
+                    <span class="stat-value" id="statClean">0/10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Rest:</span>
+                    <span class="stat-value" id="statRest">0/10</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gameplay Summary Section -->
+        <section class="report-section">
+            <h2 class="section-title">Gameplay Summary</h2>
+            <div class="gameplay-grid">
+                <div class="gameplay-column">
+                    <h3 class="column-title">Transaction Log</h3>
+                    <div class="transaction-log" id="transactionLog"></div>
+                </div>
+                <div class="gameplay-column">
+                    <h3 class="column-title">Action Summary</h3>
+                    <div class="action-summary" id="actionSummary"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Summary Section -->
+        <section class="report-section">
+            <h2 class="section-title">Financial Summary</h2>
+            <div class="financial-grid">
+                <div class="financial-item">
+                    <span class="financial-label">Total Money Earned (Competitions):</span>
+                    <span class="financial-value positive" id="totalEarned">$0</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Total Money Spent (Care Actions):</span>
+                    <span class="financial-value negative" id="totalSpent">$0</span>
+                </div>
+                <div class="financial-item highlight">
+                    <span class="financial-label">Final Balance:</span>
+                    <span class="financial-value" id="finalBalance">$0</span>
+                </div>
+                <div class="financial-item">
+                    <span class="financial-label">Competitions Won:</span>
+                    <span class="financial-value" id="competitionsCount">0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Outcome Section -->
+        <section class="report-section outcome-section">
+            <div class="outcome-box">
+                <h2 class="outcome-title">🏆 WIN – All Badges Earned 🏆</h2>
+                <p class="outcome-message">Pet Successfully Cared For</p>
+            </div>
+        </section>
+
+        <!-- Play Again Button -->
+        <div class="report-actions">
+            <a href="Instructions.html" class="play-again-btn">Play Again</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Display final report when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            const state = getGameState();
+            const petName = localStorage.getItem('petName') || 'Your Pet';
+            const petType = localStorage.getItem('petType') || 'Unknown';
+            
+            // Pet Information
+            document.getElementById('reportPetName').textContent = petName;
+            document.getElementById('reportPetType').textContent = petType.charAt(0).toUpperCase() + petType.slice(1);
+            
+            // Achievement Summary - List all badges
+            loadBadges();
+            const badgesList = document.getElementById('badgesEarnedList');
+            const badgeNames = {
+                happyPet: '😄 Super Happy Pet - All stats 9 or higher',
+                cleanPet: '🧼 Sparkling Clean - Clean stat reached 10',
+                moneyMaster: '💰 Money Master - Balance reached $200',
+                firstCompetition: '🏆 First Competition - Won first competition',
+                fullyRested: '⚡ Fully Rested - Rest stat reached 10'
+            };
+            
+            let badgesHTML = '<ul class="badge-list">';
+            for (let key in badges) {
+                if (badges[key]) {
+                    badgesHTML += `<li class="badge-earned">✓ ${badgeNames[key]}</li>`;
+                }
+            }
+            badgesHTML += '</ul>';
+            badgesList.innerHTML = badgesHTML;
+            
+            // Final Pet Stats
+            document.getElementById('statFeed').textContent = `${state.feed}/10`;
+            document.getElementById('statPlay').textContent = `${state.play}/10`;
+            document.getElementById('statHealth').textContent = `${state.health}/10`;
+            document.getElementById('statClean').textContent = `${state.clean}/10`;
+            document.getElementById('statRest').textContent = `${state.rest}/10`;
+            
+            // Gameplay Summary
+            const transactions = state.transactions || [];
+            const transactionLogDiv = document.getElementById('transactionLog');
+            
+            if (transactions.length > 0) {
+                let logHTML = '<ol class="transaction-list">';
+                transactions.forEach(t => {
+                    const amountClass = t.amount > 0 ? 'positive' : 'negative';
+                    const amountSign = t.amount > 0 ? '+' : '';
+                    logHTML += `<li>${t.action} - <span class="${amountClass}">${amountSign}$${Math.abs(t.amount)}</span></li>`;
+                });
+                logHTML += '</ol>';
+                transactionLogDiv.innerHTML = logHTML;
+            } else {
+                transactionLogDiv.innerHTML = '<p class="no-data">No transactions recorded</p>';
+            }
+            
+            // Action Summary
+            const actionSummaryDiv = document.getElementById('actionSummary');
+            const actionTotals = {};
+            
+            transactions.forEach(t => {
+                if (!actionTotals[t.action]) {
+                    actionTotals[t.action] = { count: 0, total: 0 };
+                }
+                actionTotals[t.action].count++;
+                actionTotals[t.action].total += Math.abs(t.amount);
+            });
+            
+            let summaryHTML = '<table class="summary-table">';
+            summaryHTML += '<tr><th>Action</th><th>Count</th><th>Total</th></tr>';
+            for (let action in actionTotals) {
+                summaryHTML += `<tr>
+                    <td>${action}</td>
+                    <td>${actionTotals[action].count}</td>
+                    <td>$${actionTotals[action].total}</td>
+                </tr>`;
+            }
+            summaryHTML += '</table>';
+            actionSummaryDiv.innerHTML = summaryHTML;
+            
+            // Financial Summary
+            let totalEarned = 0;
+            let totalSpent = 0;
+            
+            transactions.forEach(t => {
+                if (t.amount > 0) {
+                    totalEarned += t.amount;
+                } else {
+                    totalSpent += Math.abs(t.amount);
+                }
+            });
+            
+            document.getElementById('totalEarned').textContent = `$${totalEarned}`;
+            document.getElementById('totalSpent').textContent = `$${totalSpent}`;
+            document.getElementById('finalBalance').textContent = `$${state.money}`;
+            document.getElementById('competitionsCount').textContent = state.competitionsWon || 0;
+        });
+    </script>
+</body>
+</html>

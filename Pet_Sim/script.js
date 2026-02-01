@@ -23,7 +23,9 @@ const DEFAULT_GAME_STATE = {
     health: 5,             // Pet's health level (lower = sicker)
     clean: 5,              // Pet's cleanliness level (lower = dirtier)
     rest: 5,               // Pet's rest/energy level (recovered through rest action)
-    money: 200             // Player's total money balance
+    money: 200,            // Player's total money balance
+    transactions: [],      // History of all transactions for final report
+    competitionsWon: 0     // Number of competitions won
 };
 
 // ============================================================
@@ -442,6 +444,16 @@ function performAction(actionName) {
     
     // Deduct the cost from player's money
     state.money -= cost;
+    
+    // Track transaction if it has a cost
+    if (cost > 0) {
+        if (!state.transactions) state.transactions = [];
+        state.transactions.push({
+            action: actionName.charAt(0).toUpperCase() + actionName.slice(1),
+            amount: -cost,
+            timestamp: Date.now()
+        });
+    }
     
     // Modify stats based on which action is being performed
     switch(actionName) {
@@ -1422,6 +1434,19 @@ function endGame() {
     // Add winnings from the game
     state.money += gameData.money;
     
+    // Track competition win
+    if (gameData.money > 0) {
+        if (!state.competitionsWon) state.competitionsWon = 0;
+        state.competitionsWon++;
+        
+        if (!state.transactions) state.transactions = [];
+        state.transactions.push({
+            action: 'Competition',
+            amount: gameData.money,
+            timestamp: Date.now()
+        });
+    }
+    
     // Save the updated game state
     saveGameState(state);
     
@@ -1540,6 +1565,15 @@ function checkBadges() {
         showBadgeNotification(earnedBadgeName);
         // Refresh badge colors immediately
         displayBadges();
+        
+        // Check if all 5 badges have been earned
+        if (badges.happyPet && badges.cleanPet && badges.moneyMaster && 
+            badges.firstCompetition && badges.fullyRested) {
+            // All badges earned - show win confirmation popup
+            setTimeout(() => {
+                showWinPopup();
+            }, 3000); // 3 second delay to let them see the final badge
+        }
     }
 }
 
@@ -1561,7 +1595,49 @@ function checkFirstCompetitionBadge() {
         console.log('🎉 First Competition badge earned!');
         // Ensure the home page display is updated immediately if present
         if (document.getElementById('badgeContainer')) displayBadges();
+        
+        // Check if all 5 badges have been earned
+        if (badges.happyPet && badges.cleanPet && badges.moneyMaster && 
+            badges.firstCompetition && badges.fullyRested) {
+            // All badges earned - show win confirmation popup
+            setTimeout(() => {
+                showWinPopup();
+            }, 3000); // 3 second delay to let them see the final badge
+        }
     }
+}
+
+/**
+ * showWinPopup() - Display a win confirmation popup when all badges are earned
+ * Player must click to proceed to the final report
+ */
+function showWinPopup() {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'badge-popup-overlay';
+    overlay.id = 'winPopupOverlay';
+    
+    // Create popup
+    const popup = document.createElement('div');
+    popup.className = 'badge-popup win-popup';
+    popup.innerHTML = `
+        <span class="badge-popup-icon">🏆</span>
+        <div class="badge-popup-title">CONGRATULATIONS!</div>
+        <div class="badge-popup-message"><strong>You've earned all 5 badges!</strong></div>
+        <div class="badge-popup-message">Your pet is perfectly cared for!</div>
+        <button class="badge-popup-close" onclick="goToFinalReport()">View Final Report</button>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+}
+
+/**
+ * goToFinalReport() - Navigate to the final achievement report
+ * Called when player clicks the win popup button
+ */
+function goToFinalReport() {
+    window.location.href = 'End.html';
 }
 
 /**
