@@ -19,12 +19,12 @@ let petType = '';          // Selected pet type: 'dog', 'cat', or 'bunny'
 // All stat values are on a 0-10 scale, money is in dollars
 const DEFAULT_GAME_STATE = {
     hunger: 5,             // Pet's hunger level (lower = hungrier)
-    energy: 5,             // Pet's energy level (lower = more tired)
+    play: 5,               // Pet's play/activity level (exercise and stimulation)
     happiness: 5,          // Pet's happiness level (lower = sadder)
     health: 5,             // Pet's health level (lower = sicker)
     cleanliness: 5,        // Pet's cleanliness level (lower = dirtier)
-    play: 5,               // Pet's play stat (currently unused but available)
-    money: 100             // Player's total money balance
+    rest: 5,               // Pet's rest/energy level (recovered through rest action)
+    money: 200             // Player's total money balance
 };
 
 // ============================================================
@@ -163,13 +163,13 @@ let player = {
  * All getters/setters automatically sync with petGameState
  */
 let pet = {
-    // Get/set rest stat (syncs with state.energy)
+    // Get/set rest stat (syncs with state.health for Rest page display)
     get rest() {
-        return getGameState().energy;
+        return getGameState().health;
     },
     set rest(value) {
         const state = getGameState();
-        state.energy = clampStat(value);
+        state.health = clampStat(value);
         saveGameState(state);
     },
     
@@ -234,28 +234,9 @@ function startStatDecay() {
     if (healthDecayTimer) clearInterval(healthDecayTimer);
     if (cleanDecayTimer) clearInterval(cleanDecayTimer);
     
-    // Health & hunger decrease every 15 seconds (900,000 milliseconds)
-    healthDecayTimer = setInterval(function() {
-        const state = getGameState();
-        // Decrease both health and hunger by 1 point
-        state.health = clampStat(state.health - 1);
-        state.hunger = clampStat(state.hunger - 1);
-        saveGameState(state);
-        // Update the pet's image based on new stats
-        updatePetImageBasedOnStatsHome();
-        console.log('Stat decay: Health and Hunger decreased');
-    }, 15000);
-    
-    // Cleanliness decreases every 20 seconds (20,000 milliseconds)
-    cleanDecayTimer = setInterval(function() {
-        const state = getGameState();
-        // Decrease cleanliness by 1 point
-        state.cleanliness = clampStat(state.cleanliness - 1);
-        saveGameState(state);
-        // Update the pet's image based on new stats
-        updatePetImageBasedOnStatsHome();
-        console.log('Stat decay: Cleanliness decreased');
-    }, 20000);
+    // STAT DECAY DISABLED - No time-based decay for better gameplay balance
+    // Players must manage stats through their actions and choices
+    // This prevents frustration from constant maintenance and allows strategic play
 }
 
 /**
@@ -290,7 +271,7 @@ function performAction(actionName) {
         'play': 0,      // Free action
         'feed': 10,     // Costs $10
         'clean': 5,     // Costs $5
-        'rest': 0,      // Free action
+        'rest': Math.floor(Math.random() * 6),  // Costs $0-$5 (random)
         'vet': 50       // Costs $50
     };
     
@@ -309,9 +290,10 @@ function performAction(actionName) {
     // Modify stats based on which action is being performed
     switch(actionName) {
         case 'play':
-            // Play action: increase happiness (+1), decrease cleanliness (-2)
+            // Play action: increase happiness (+1) and play (+1), decrease cleanliness (-1)
             state.happiness = clampStat(state.happiness + 1);
-            state.cleanliness = clampStat(state.cleanliness - 2);
+            state.play = clampStat(state.play + 1);
+            state.cleanliness = clampStat(state.cleanliness - 1);
             break;
             
         case 'feed':
@@ -325,13 +307,13 @@ function performAction(actionName) {
             break;
             
         case 'rest':
-            // Rest action: increase both energy and health
-            state.energy = clampStat(state.energy + 1);
+            // Rest action: increase rest stat and provide small health recovery
+            state.rest = clampStat(state.rest + 1);
             state.health = clampStat(state.health + 1);
             break;
             
         case 'vet':
-            // Vet action: significantly increase health (+3)
+            // Vet action: major health boost (+3)
             state.health = clampStat(state.health + 3);
             break;
     }
@@ -341,9 +323,16 @@ function performAction(actionName) {
     // Update money display on home page
     updateMoneyDisplay();
     
+    // Check for low balance and show warning
+    if (state.money < 50) {
+        setTimeout(() => {
+            alert("Your balance is getting low! Attend a competition to earn money.");
+        }, 100); // Small delay so it shows after the action completes
+    }
+    
     // Log action details for debugging
     console.log(`${actionName} performed. Cost: $${cost}. Money left: $${state.money}`);
-    console.log(`Pet stats - Hunger: ${state.hunger}, Energy: ${state.energy}, Happiness: ${state.happiness}, Health: ${state.health}, Cleanliness: ${state.cleanliness}`);
+    console.log(`Pet stats - Hunger: ${state.hunger}, Play: ${state.play}, Happiness: ${state.happiness}, Health: ${state.health}, Rest: ${state.rest}, Cleanliness: ${state.cleanliness}`);
     
     // Update pet image based on new stats
     updatePetImageBasedOnStatsAction(actionName);
@@ -400,7 +389,7 @@ function updateActionPageProgressBar(actionName) {
             break;
         case 'competition':
             // Competition uses average of three important stats
-            statValue = Math.floor((state.hunger + state.energy + state.health) / 3);
+            statValue = Math.floor((state.hunger + state.play + state.health) / 3);
             break;
     }
     
@@ -513,14 +502,14 @@ function updatePetImageBasedOnStatsHome() {
     
     // Check which stats are below 4 (critical/sad)
     const belowFour = [];
-    if (state.health < 4) belowFour.push('energy');
+    if (state.health < 4) belowFour.push('health');
     if (state.hunger < 4) belowFour.push('hunger');
     if (state.happiness < 4) belowFour.push('happiness');
     if (state.cleanliness < 4) belowFour.push('cleanliness');
     
     // Check which stats are 4-6 (normal range)
     const normalRange = [];
-    if (state.health >= 4 && state.health <= 6) normalRange.push('energy');
+    if (state.health >= 4 && state.health <= 6) normalRange.push('health');
     if (state.hunger >= 4 && state.hunger <= 6) normalRange.push('hunger');
     if (state.happiness >= 4 && state.happiness <= 6) normalRange.push('happiness');
     if (state.cleanliness >= 4 && state.cleanliness <= 6) normalRange.push('cleanliness');
@@ -535,7 +524,7 @@ function updatePetImageBasedOnStatsHome() {
         needsList = belowFour;
     }
     // PRIORITY 2: If ALL stats above 7, show happy pet
-    else if (state.energy >= 7 && state.hunger >= 7 && state.happiness >= 7 && state.cleanliness >= 7 && state.health >= 7) {
+    else if (state.play >= 7 && state.hunger >= 7 && state.happiness >= 7 && state.cleanliness >= 7 && state.health >= 7) {
         mood = 'happy';
         needsList = [];
     }
@@ -811,9 +800,36 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update progress bar to show current value
         updateActionPageProgressBar(actionName);
         
+        // Track cooldown state for Rest button
+        let isOnCooldown = false;
+        
         // Listen for button click and perform the action
         actionBtn.addEventListener('click', function() {
-            performAction(actionName);
+            // Check if Rest button is on cooldown
+            if (actionName === 'rest' && isOnCooldown) {
+                return; // Don't allow action during cooldown
+            }
+            
+            // Perform the action
+            const success = performAction(actionName);
+            
+            // If Rest action was successful, start cooldown
+            if (success && actionName === 'rest') {
+                isOnCooldown = true;
+                actionBtn.disabled = true;
+                actionBtn.style.filter = 'grayscale(100%)';
+                actionBtn.style.opacity = '0.6';
+                actionBtn.style.cursor = 'not-allowed';
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    isOnCooldown = false;
+                    actionBtn.disabled = false;
+                    actionBtn.style.filter = 'grayscale(0%)';
+                    actionBtn.style.opacity = '1';
+                    actionBtn.style.cursor = 'pointer';
+                }, 3000);
+            }
         });
     }
 });
@@ -910,13 +926,12 @@ function checkCompetitionRequirements() {
     const state = getGameState();
     
     // Check each requirement
-    const hungerOk = state.hunger > 6;  // Pet must not be hungry
-    const energyOk = state.energy > 6;  // Pet must be well-rested
-    const healthOk = state.health > 6;  // Pet must be healthy
+    const hungerOk = state.hunger > 4;  // Pet must not be hungry
+    const healthOk = state.health > 4;  // Pet must be healthy
     
     // If any requirement not met, show alert and return false
-    if (!hungerOk || !energyOk || !healthOk) {
-        alert("Your pet is not ready for competition! Improve hunger, energy, and health first.");
+    if (!hungerOk || !healthOk) {
+        alert(`Your pet is not ready for competition!\n\nCurrent Stats:\nHunger: ${state.hunger}/10 ${hungerOk ? '✓' : '✗ (need >4)'}\nHealth: ${state.health}/10 ${healthOk ? '✓' : '✗ (need >4)'}`);
         return false;
     }
     
@@ -967,7 +982,7 @@ function startGame() {
     
     // Determine which pet image to show based on average stats
     let imageSrc = 'images/normal_' + petType + '.png';
-    const avgStat = (state.hunger + state.energy + state.health + state.happiness + state.cleanliness) / 5;
+    const avgStat = (state.hunger + state.play + state.health + state.happiness + state.cleanliness) / 5;
     
     // Show happy pet if average stat is high
     if (avgStat >= 8) {
@@ -1188,7 +1203,7 @@ function endGame() {
     const state = getGameState();
     
     // Deduct stats due to exertion from competition
-    state.energy = clampStat(state.energy - 3);      // Energy -3
+    state.play = clampStat(state.play - 3);          // Play -3
     state.hunger = clampStat(state.hunger - 2);      // Hunger -2
     state.cleanliness = clampStat(state.cleanliness - 2); // Cleanliness -2
     

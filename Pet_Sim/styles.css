@@ -275,6 +275,17 @@ input[type="text"]:focus {
     transform: translateY(-48%);
 }
 
+/* Action helper text styling */
+.action-helper-text {
+    position: fixed;
+    right: 80px;
+    top: 50%;
+    transform: translateY(80px);
+    font-size: 18px;
+    color: #666;
+    font-style: italic;
+}
+
 /* Progress bar styling */
 .progress-bar-container {
     position: fixed;
@@ -482,11 +493,18 @@ input[type="text"]:focus {
     border-top: 8px solid #ffeb3b;
 }
 
-/* Q&A Button styling */
-.qa-btn {
+/* Top Buttons Container */
+.top-buttons {
     position: fixed;
     top: 20px;
     left: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 999;
+}
+
+/* Q&A Button styling */
+.qa-btn {
     padding: 12px 25px;
     font-size: 16px;
     font-weight: 600;
@@ -497,7 +515,6 @@ input[type="text"]:focus {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.3s ease;
-    z-index: 999;
 }
 
 .qa-btn:hover {
