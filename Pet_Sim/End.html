@@ -100,8 +100,9 @@
         <!-- Outcome Section -->
         <section class="report-section outcome-section">
             <div class="outcome-box">
-                <h2 class="outcome-title">🏆 WIN – All Badges Earned 🏆</h2>
-                <p class="outcome-message">Pet Successfully Cared For</p>
+                <!-- Titles are intentionally empty here; content is inserted dynamically by JavaScript -->
+                <h2 class="outcome-title"></h2>
+                <p class="outcome-message"></p>
             </div>
         </section>
 
@@ -113,6 +114,79 @@
 
     <script src="script.js"></script>
     <script>
+        /*
+         * displayOutcome()
+         * - Reads badge progress from localStorage (or from the global `badges` object)
+         * - Determines whether all 5 badges are earned
+         * - Updates the Outcome section in the report dynamically
+         */
+        function displayOutcome() {
+            // Attempt to read badges from localStorage (stored as JSON under 'badges')
+            let stored = null;
+            try {
+                stored = localStorage.getItem('badges');
+            } catch (e) {
+                stored = null;
+            }
+
+            let badgesFromStorage = null;
+            if (stored) {
+                try {
+                    badgesFromStorage = JSON.parse(stored);
+                } catch (e) {
+                    badgesFromStorage = null;
+                }
+            }
+
+            // Use the badges object from storage or fall back to a global `badges` variable if present
+            let finalBadges = badgesFromStorage;
+            if ((!finalBadges || Object.keys(finalBadges).length === 0) && typeof badges !== 'undefined') {
+                finalBadges = badges;
+            }
+
+            // If still not available, try calling loadBadges() which some pages provide to populate `badges`
+            if ((!finalBadges || Object.keys(finalBadges).length === 0) && typeof loadBadges === 'function') {
+                try {
+                    loadBadges();
+                    if (typeof badges !== 'undefined') finalBadges = badges;
+                } catch (e) {
+                    // ignore errors from loadBadges
+                }
+            }
+
+            // Ensure finalBadges is an object
+            finalBadges = finalBadges || {};
+
+            // Count how many badge values are true
+            const badgeKeys = Object.keys(finalBadges);
+            // There are 5 total badges in this game; user wins only if all 5 are true
+            let allEarned = false;
+            if (badgeKeys.length >= 5) {
+                const trueCount = badgeKeys.reduce((acc, k) => acc + (finalBadges[k] === true ? 1 : 0), 0);
+                allEarned = (trueCount === 5);
+            } else {
+                // If storage doesn't list all badges, treat as not all earned
+                allEarned = false;
+            }
+
+            // Update DOM elements in the Outcome section
+            const titleEl = document.querySelector('.outcome-title');
+            const msgEl = document.querySelector('.outcome-message');
+            if (!titleEl || !msgEl) return;
+
+            if (allEarned) {
+                titleEl.textContent = '🏆 WIN – All Badges Earned 🏆';
+                msgEl.textContent = 'Pet Successfully Cared For';
+                titleEl.classList.remove('outcome-fail');
+                msgEl.classList.remove('outcome-fail');
+            } else {
+                titleEl.textContent = '❌ SIMULATION INCOMPLETE ❌';
+                msgEl.textContent = 'Your pet still needed more care. Try again!';
+                titleEl.classList.add('outcome-fail');
+                msgEl.classList.add('outcome-fail');
+            }
+        }
+
         // Display final report when page loads
         window.addEventListener('DOMContentLoaded', function() {
             const state = getGameState();
@@ -207,6 +281,8 @@
             document.getElementById('totalSpent').textContent = `$${totalSpent}`;
             document.getElementById('finalBalance').textContent = `$${state.money}`;
             document.getElementById('competitionsCount').textContent = state.competitionsWon || 0;
+            // Update the Outcome section dynamically based on badge progress
+            displayOutcome();
         });
     </script>
 </body>

@@ -3,28 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta http-equiv="refresh" content="0;url=Selection.html"> -->
-    <title> Virtual Pet - Setup </title>
-    <!-- Link to external CSS file -->
+    <title>Instructions - Virtual Pet</title>
+    <!-- Use project stylesheet for consistent look -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Game Instructions</h1>
-  <h2>Instructions: How to Play</h2>
-  <p>Step 1: Select your Pet and their name.</p>
-  <p>Step 2: Keep your pet healthy and happy.</p>
-  <p>Step 3: Do a pet competition to earn money</p>
-  <p>Step 4: Use your money for feeding, cleaning, and vet visits. </p>
-  <p>Step 5: Buy toys for your pet to make the happiest pet!</p>
 
-  
-  <button id="startButton">Start</button>
+<!-- Page container reusing project styles -->
+<div class="qa-container">
+  <div class="qa-box">
 
-  <script>
-    document.getElementById("startButton").addEventListener("click", function() {
-      window.location.href = "selection.html";
-    });
-  </script>
+    <!-- Header / Title -->
+    <h1>🐾 Quick Start Guide</h1>
+
+    <!-- Short intro paragraph -->
+    <!-- This paragraph gives a quick one-line intro for players. -->
+    <p style="text-align:center; color:#555; margin:10px 0 20px;">Follow these steps to create and care for your virtual pet.</p>
+
+    <!-- Instruction list: numbered steps with concise descriptions -->
+    <!-- Using an ordered list to preserve numbering and readability -->
+    <ol style="text-align:left; font-size:18px; line-height:1.6;">
+      <li>
+        <strong>Create Your Pet</strong><br>
+        Enter a name (2–20 letters only) and choose a Dog, Cat, or Bunny. Click Next to begin.
+      </li>
+
+      <li>
+        <strong>Monitor Your Pet’s Stats</strong><br>
+        Your pet has 5 stats: Hunger, Energy, Happiness, Health, and Cleanliness (range 0–10).
+      </li>
+
+      <li>
+        <strong>Keep Stats Balanced</strong><br>
+        If any stat drops to 3 or below, your pet becomes sad. If all stats are 7 or higher, your pet becomes happy.
+      </li>
+
+      <li>
+        <strong>Take Care of Your Pet</strong><br>
+        Use the action buttons to Feed, Rest, Play, Clean, and visit the Vet. Each action changes stats, and some cost money.
+      </li>
+
+      <li>
+        <strong>Buy Toys for Your Pet</strong><br>
+        You can purchase toys using money. Bought toys appear next to your pet on the home screen and add personality to your pet’s space.
+      </li>
+
+      <li>
+        <strong>Manage Your Money</strong><br>
+        Some actions and toys cost money, while competitions help you earn more. Spend wisely so you can continue caring for your pet.
+      </li>
+
+      <li>
+        <strong>Enter Competitions</strong><br>
+        If your pet meets the stat requirements, you can play a mini-game to earn money. The more obstacles you pass, the more you win.
+      </li>
+
+      <li>
+        <strong>Earn Badges</strong><br>
+        Complete special goals to unlock badges. All badges start gray and turn colored when earned. Badges stay earned unless you restart the game.
+      </li>
+
+      <li>
+        <strong>Use the Q&amp;A Page</strong><br>
+        Click the Q&amp;A button anytime to ask questions about how the game works. The system will provide helpful answers.
+      </li>
+
+      <li>
+        <strong>End the Game</strong><br>
+        Click End Game on the home page to see a summary of your simulation, including: Pet information, Final stats, Badges earned, Money transaction summary. You win if you earned all badges. You lose if you did not earn them all.
+      </li>
+
+      <li>
+        <strong>Restart Anytime</strong><br>
+        Use the Restart button to start over with a new pet. This resets stats, money, toys, and badges.
+      </li>
+    </ol>
+
+    <!-- Navigation buttons: use existing button styles for consistency -->
+    <div style="display:flex; gap:12px; justify-content:center; margin-top:24px;">
+      <!-- Back to Home -->
+      <a class="qa-back-btn" href="Home.html">Home</a>
+
+      <!-- Go to Selection (create pet) -->
+      <a class="qa-ask-btn" href="Selection.html">Create Pet</a>
+
+      <!-- Q&A page link -->
+      <a class="qa-btn" href="Q and A.html">Q&amp;A</a>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
 
