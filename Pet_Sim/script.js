@@ -27,6 +27,119 @@ const DEFAULT_GAME_STATE = {
 };
 
 // ============================================================
+// SECTION 1.5: BADGE SYSTEM
+// ============================================================
+// Tracks earned badges that persist in localStorage
+
+/**
+ * Badge tracking object - manages all achievements
+ * Each badge can only be earned once and persists permanently
+ */
+let badges = {
+    happyPet: false,         // All stats >= 8
+    cleanPet: false,         // Clean stat = 10
+    moneyMaster: false,      // Total balance >= $200
+    firstCompetition: false, // First competition victory
+    fullyRested: false       // Rest stat = 10
+};
+
+/**
+ * Badge configuration with display information
+ * Used by displayBadges() to render earned badges
+ */
+const BADGE_CONFIG = {
+    happyPet: {
+        icon: '😄',
+        title: 'Super Happy Pet',
+        description: 'All stats 8 or higher'
+    },
+    cleanPet: {
+        icon: '🧼',
+        title: 'Sparkling Clean',
+        description: 'Clean stat reached 10'
+    },
+    moneyMaster: {
+        icon: '💰',
+        title: 'Money Master',
+        description: 'Balance reached $200'
+    },
+    firstCompetition: {
+        icon: '🏆',
+        title: 'First Competition',
+        description: 'Won first competition'
+    },
+    fullyRested: {
+        icon: '⚡',
+        title: 'Fully Rested',
+        description: 'Rest stat reached 10'
+    }
+};
+
+/**
+ * loadBadges() - Retrieve earned badges from localStorage
+ * Called on page initialization and before checking badges
+ * Ensures all 5 badge properties are always present and synced with localStorage
+ */
+function loadBadges() {
+    // Define default empty badge state
+    const defaultBadges = {
+        happyPet: false,
+        cleanPet: false,
+        moneyMaster: false,
+        firstCompetition: false,
+        fullyRested: false
+    };
+    
+    // Try to load from localStorage
+    const stored = localStorage.getItem('petBadges');
+    if (stored) {
+        try {
+            const parsed = JSON.parse(stored);
+            // Merge parsed data with defaults to ensure all 5 properties exist
+            badges = {
+                happyPet: Boolean(parsed.happyPet) || false,
+                cleanPet: Boolean(parsed.cleanPet) || false,
+                moneyMaster: Boolean(parsed.moneyMaster) || false,
+                firstCompetition: Boolean(parsed.firstCompetition) || false,
+                fullyRested: Boolean(parsed.fullyRested) || false
+            };
+            console.log('Badges loaded from localStorage:', badges);
+        } catch (e) {
+            console.error('Failed to parse badges from localStorage:', e);
+            // If parsing fails, reset to defaults
+            badges = { ...defaultBadges };
+        }
+    } else {
+        // If localStorage is empty, ensure badges object has all properties initialized
+        // This prevents undefined properties from breaking the system
+        badges = { ...defaultBadges };
+    }
+}
+
+/**
+ * saveBadges() - Save earned badges to localStorage
+ * Called whenever a new badge is earned
+ * Ensures all 5 badge properties are always persisted
+ */
+function saveBadges() {
+    try {
+        // Ensure all 5 properties are present before saving (prevents partial saves)
+        const badgesToSave = {
+            happyPet: badges.happyPet === true,
+            cleanPet: badges.cleanPet === true,
+            moneyMaster: badges.moneyMaster === true,
+            firstCompetition: badges.firstCompetition === true,
+            fullyRested: badges.fullyRested === true
+        };
+        // Persist to localStorage
+        localStorage.setItem('petBadges', JSON.stringify(badgesToSave));
+        console.log('Badges saved to localStorage:', badgesToSave);
+    } catch (e) {
+        console.error('Failed to save badges:', e);
+    }
+}
+
+// ============================================================
 // SECTION 2: GAME STATE HELPER FUNCTIONS
 // ============================================================
 // These functions manage reading, writing, and validating game data
@@ -145,6 +258,26 @@ function restartGame() {
     localStorage.removeItem('petName');
     localStorage.removeItem('petType');
     console.log('Pet name and type have been cleared.');
+
+    // --- Reset earned badges on restart ---
+    // Clear badges so none are considered earned after restart.
+    // This will remove the saved badge state and reset the in-memory object.
+    try {
+        localStorage.removeItem('petBadges');
+    } catch (e) {
+        console.error('Failed to remove petBadges from localStorage:', e);
+    }
+    // Reset the in-memory badges object and persist the cleared state
+    badges = {
+        happyPet: false,
+        cleanPet: false,
+        moneyMaster: false,
+        firstCompetition: false,
+        fullyRested: false
+    };
+    saveBadges();
+    // If the home page is open, refresh the badge display immediately
+    if (document.getElementById('badgeContainer')) displayBadges();
     
     // Redirect to the pet selection page to start fresh
     console.log('Redirecting to Selection.html');
@@ -343,6 +476,10 @@ function performAction(actionName) {
     
     // Save the updated game state
     saveGameState(state);
+    
+    // Check for new badges
+    checkBadges();
+    
     // Update money display on home page
     updateMoneyDisplay();
     
@@ -728,6 +865,10 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMoneyDisplay();
         // Start stat decay on home page
         startStatDecay();
+        
+        // Load and display badges on home page
+        loadBadges();
+        displayBadges();
     } else {
         // Stop stat decay when leaving home page
         stopStatDecay();
@@ -1237,6 +1378,12 @@ function endGame() {
     // Save the updated game state
     saveGameState(state);
     
+    // Check for badges (especially first competition badge)
+    if (gameData.money > 0) {
+        checkFirstCompetitionBadge();
+        checkBadges();
+    }
+    
     // Hide game canvas and show game over screen
     const gameStateDiv = document.getElementById('gameState');
     const gameOverState = document.getElementById('gameOverState');
@@ -1279,6 +1426,182 @@ function onPlayAgainClicked() {
  */
 function onReturnHomeClicked() {
     window.location.href = 'Home.html';
+}
+
+// ============================================================
+// SECTION 11: BADGE SYSTEM FUNCTIONS
+// ============================================================
+// Manages badge checking, earning, and displaying
+
+/**
+ * checkBadges() - Check all badge conditions and award new badges
+ * Called whenever stats or money change
+ * Shows notification popup when new badge is earned
+ * CRITICAL: Must load badges first to ensure we have all previously earned badges
+ */
+function checkBadges() {
+    // Load the latest badge state from localStorage FIRST
+    // This ensures we don't lose any previously earned badges
+    loadBadges();
+    
+    // Evaluate badge conditions based on the saved game state.
+    // Once a badge is earned it is never revoked (persisted in localStorage).
+    // This function checks if any new badges should be marked as earned.
+    const state = getGameState();
+    let newBadgeEarned = false; // track if any badge was newly earned
+    let earnedBadgeName = '';
+    
+    // Check Super Happy Pet Badge (all stats >= 9)
+    // Requirement changed to 9 for more challenge
+    if (!badges.happyPet && 
+        state.feed >= 9 && state.play >= 9 && 
+        state.health >= 9 && state.clean >= 9 && 
+        state.rest >= 9) {
+        badges.happyPet = true;
+        newBadgeEarned = true;
+        earnedBadgeName = 'happyPet';
+        console.log('🎉 Super Happy Pet badge earned!');
+    }
+    
+    // Check Sparkling Clean Badge (clean stat = 10)
+    if (!badges.cleanPet && state.clean === 10) {
+        badges.cleanPet = true;
+        newBadgeEarned = true;
+        earnedBadgeName = 'cleanPet';
+        console.log('🎉 Sparkling Clean badge earned!');
+    }
+    
+    // Check Money Master Badge (balance >= $200)
+    if (!badges.moneyMaster && state.money >= 200) {
+        badges.moneyMaster = true;
+        newBadgeEarned = true;
+        earnedBadgeName = 'moneyMaster';
+        console.log('🎉 Money Master badge earned!');
+    }
+    
+    // Check Fully Rested Badge (rest stat = 10)
+    if (!badges.fullyRested && state.rest === 10) {
+        badges.fullyRested = true;
+        newBadgeEarned = true;
+        earnedBadgeName = 'fullyRested';
+        console.log('🎉 Fully Rested badge earned!');
+    }
+    
+    // If a new badge was earned, persist it and show a notification
+    if (newBadgeEarned) {
+        saveBadges();
+        showBadgeNotification(earnedBadgeName);
+        // Refresh badge colors immediately
+        displayBadges();
+    }
+}
+
+/**
+ * checkFirstCompetitionBadge() - Award badge for first competition victory
+ * Called from endGame() when player wins a competition
+ * CRITICAL: Must load badges first to ensure we have all previously earned badges
+ */
+function checkFirstCompetitionBadge() {
+    // Load the latest badge state from localStorage FIRST
+    // This ensures we don't lose any previously earned badges
+    loadBadges();
+    
+    // Award the competition badge once (first successful competition).
+    if (!badges.firstCompetition) {
+        badges.firstCompetition = true;
+        saveBadges();
+        showBadgeNotification('firstCompetition');
+        console.log('🎉 First Competition badge earned!');
+        // Ensure the home page display is updated immediately if present
+        if (document.getElementById('badgeContainer')) displayBadges();
+    }
+}
+
+/**
+ * showBadgeNotification() - Display a popup notification when badge is earned
+ * Creates a temporary overlay and popup showing the new badge
+ */
+function showBadgeNotification(badgeName) {
+    const badgeInfo = BADGE_CONFIG[badgeName];
+    
+    if (!badgeInfo) return;
+    
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'badge-popup-overlay';
+    
+    // Create popup
+    const popup = document.createElement('div');
+    popup.className = 'badge-popup';
+    popup.innerHTML = `
+        <span class="badge-popup-icon">${badgeInfo.icon}</span>
+        <div class="badge-popup-title">Badge Earned! 🎉</div>
+        <div class="badge-popup-message"><strong>${badgeInfo.title}</strong></div>
+        <div class="badge-popup-message">${badgeInfo.description}</div>
+        <button class="badge-popup-close" onclick="closeBadgePopup()">Awesome!</button>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+        closeBadgePopup();
+    }, 5000);
+}
+
+/**
+ * closeBadgePopup() - Remove the badge notification popup
+ */
+function closeBadgePopup() {
+    const popup = document.querySelector('.badge-popup');
+    const overlay = document.querySelector('.badge-popup-overlay');
+    
+    if (popup) popup.remove();
+    if (overlay) overlay.remove();
+}
+
+/**
+ * displayBadges() - Update badge colors based on earned state
+ * Called when home page loads and whenever a badge is earned.
+ * Uses CSS classes to show earned (colored) vs not-earned (grayed) state.
+ * All 5 badges are always visible; the disabled class determines gray vs colored.
+ */
+function displayBadges() {
+    // Ensure we have the latest badge state from storage
+    loadBadges();
+
+    // Define badge element IDs mapped to badge key names
+    const badgeMap = {
+        'badge-happyPet': 'happyPet',
+        'badge-cleanPet': 'cleanPet',
+        'badge-moneyMaster': 'moneyMaster',
+        'badge-firstCompetition': 'firstCompetition',
+        'badge-fullyRested': 'fullyRested'
+    };
+
+    // Loop through each badge element and apply the appropriate class
+    for (const [elementId, badgeKey] of Object.entries(badgeMap)) {
+        const badgeElement = document.getElementById(elementId);
+        if (!badgeElement) {
+            console.warn(`Badge element not found: ${elementId}`);
+            continue;
+        }
+
+        const isEarned = badges[badgeKey] === true;
+        
+        if (isEarned) {
+            // Badge earned: remove gray disabled class (shows colored gradient)
+            badgeElement.classList.remove('badge-disabled');
+            console.log(`✓ Badge "${badgeKey}" is colored (earned)`);
+        } else {
+            // Badge not earned: add gray disabled class (shows grayscale)
+            badgeElement.classList.add('badge-disabled');
+            console.log(`✗ Badge "${badgeKey}" is grayed (not earned)`);
+        }
+    }
+    
+    console.log('All badges updated. Current state:', badges);
 }
 
 // Initialize competition page when it loads
