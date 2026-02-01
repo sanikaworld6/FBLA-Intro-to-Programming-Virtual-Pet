@@ -18,11 +18,10 @@ let petType = '';          // Selected pet type: 'dog', 'cat', or 'bunny'
 // Default game state structure - used when game is first started
 // All stat values are on a 0-10 scale, money is in dollars
 const DEFAULT_GAME_STATE = {
-    hunger: 5,             // Pet's hunger level (lower = hungrier)
+    feed: 5,               // Pet's feed level (how well fed the pet is)
     play: 5,               // Pet's play/activity level (exercise and stimulation)
-    happiness: 5,          // Pet's happiness level (lower = sadder)
     health: 5,             // Pet's health level (lower = sicker)
-    cleanliness: 5,        // Pet's cleanliness level (lower = dirtier)
+    clean: 5,              // Pet's cleanliness level (lower = dirtier)
     rest: 5,               // Pet's rest/energy level (recovered through rest action)
     money: 200             // Player's total money balance
 };
@@ -44,7 +43,31 @@ function getGameState() {
     // If data exists, parse it and return it
     if (stored) {
         try {
-            return JSON.parse(stored);
+            const state = JSON.parse(stored);
+            // Migrate old saves: convert hunger to feed, ensure rest exists
+            if (state.hunger !== undefined && state.feed === undefined) {
+                state.feed = state.hunger;
+                delete state.hunger;
+            }
+            if (state.feed === undefined) {
+                state.feed = 5;
+            }
+            if (state.rest === undefined) {
+                state.rest = 5;
+            }
+            // Migrate cleanliness to clean
+            if (state.cleanliness !== undefined && state.clean === undefined) {
+                state.clean = state.cleanliness;
+                delete state.cleanliness;
+            }
+            if (state.clean === undefined) {
+                state.clean = 5;
+            }
+            // Remove deprecated stats
+            delete state.happiness;
+            delete state.hunger;
+            delete state.cleanliness;
+            return state;
         } catch (e) {
             // If JSON parsing fails, log error and return defaults
             console.error('Failed to parse petGameState:', e);
@@ -193,23 +216,23 @@ let pet = {
         saveGameState(state);
     },
     
-    // Get/set feed stat (syncs with state.hunger)
+    // Get/set feed stat (syncs with state.feed)
     get feed() {
-        return getGameState().hunger;
+        return getGameState().feed;
     },
     set feed(value) {
         const state = getGameState();
-        state.hunger = clampStat(value);
+        state.feed = clampStat(value);
         saveGameState(state);
     },
     
-    // Get/set clean stat (syncs with state.cleanliness)
+    // Get/set clean stat (syncs with state.clean)
     get clean() {
-        return getGameState().cleanliness;
+        return getGameState().clean;
     },
     set clean(value) {
         const state = getGameState();
-        state.cleanliness = clampStat(value);
+        state.clean = clampStat(value);
         saveGameState(state);
     }
 };
@@ -293,17 +316,17 @@ function performAction(actionName) {
             // Play action: increase happiness (+1) and play (+1), decrease cleanliness (-1)
             state.happiness = clampStat(state.happiness + 1);
             state.play = clampStat(state.play + 1);
-            state.cleanliness = clampStat(state.cleanliness - 1);
+            state.clean = clampStat(state.clean - 1);
             break;
             
         case 'feed':
-            // Feed action: increase hunger (lower value = hungry, so more is better)
-            state.hunger = clampStat(state.hunger + 1);
+            // Feed action: increase feed stat
+            state.feed = clampStat(state.feed + 1);
             break;
             
         case 'clean':
             // Clean action: increase cleanliness
-            state.cleanliness = clampStat(state.cleanliness + 1);
+            state.clean = clampStat(state.clean + 1);
             break;
             
         case 'rest':
@@ -332,7 +355,7 @@ function performAction(actionName) {
     
     // Log action details for debugging
     console.log(`${actionName} performed. Cost: $${cost}. Money left: $${state.money}`);
-    console.log(`Pet stats - Hunger: ${state.hunger}, Play: ${state.play}, Happiness: ${state.happiness}, Health: ${state.health}, Rest: ${state.rest}, Cleanliness: ${state.cleanliness}`);
+    console.log(`Pet stats - Feed: ${state.feed}, Play: ${state.play}, Health: ${state.health}, Rest: ${state.rest}, Clean: ${state.clean}`);
     
     // Update pet image based on new stats
     updatePetImageBasedOnStatsAction(actionName);
@@ -373,23 +396,23 @@ function updateActionPageProgressBar(actionName) {
     // Get the stat value that corresponds to this action
     switch(actionName) {
         case 'play':
-            statValue = state.happiness;
+            statValue = state.play;
             break;
         case 'rest':
-            statValue = state.health;
+            statValue = state.rest;
             break;
         case 'feed':
-            statValue = state.hunger;
+            statValue = state.feed;
             break;
         case 'clean':
-            statValue = state.cleanliness;
+            statValue = state.clean;
             break;
         case 'vet':
             statValue = state.health;
             break;
         case 'competition':
             // Competition uses average of three important stats
-            statValue = Math.floor((state.hunger + state.play + state.health) / 3);
+            statValue = Math.floor((state.feed + state.play + state.health) / 3);
             break;
     }
     
@@ -414,14 +437,14 @@ function refreshProgressBars() {
     // === PLAY PROGRESS BAR ===
     const playFill = document.getElementById('playProgressFill');
     const playText = document.getElementById('playProgressText');
-    if (playFill) playFill.style.width = (state.happiness * fillPercentage) + '%';
-    if (playText) playText.textContent = state.happiness + '/10';
+    if (playFill) playFill.style.width = (state.play * fillPercentage) + '%';
+    if (playText) playText.textContent = state.play + '/10';
     
-    // === REST PROGRESS BAR (shows health) ===
+    // === REST PROGRESS BAR (shows rest) ===
     const restFill = document.getElementById('restProgressFill');
     const restText = document.getElementById('restProgressText');
-    if (restFill) restFill.style.width = (state.health * fillPercentage) + '%';
-    if (restText) restText.textContent = state.health + '/10';
+    if (restFill) restFill.style.width = (state.rest * fillPercentage) + '%';
+    if (restText) restText.textContent = state.rest + '/10';
     
     // === VET PROGRESS BAR (also shows health) ===
     const vetFill = document.getElementById('vetProgressFill');
@@ -432,20 +455,20 @@ function refreshProgressBars() {
     // === CLEAN PROGRESS BAR ===
     const cleanFill = document.getElementById('cleanProgressFill');
     const cleanText = document.getElementById('cleanProgressText');
-    if (cleanFill) cleanFill.style.width = (state.cleanliness * fillPercentage) + '%';
-    if (cleanText) cleanText.textContent = state.cleanliness + '/10';
+    if (cleanFill) cleanFill.style.width = (state.clean * fillPercentage) + '%';
+    if (cleanText) cleanText.textContent = state.clean + '/10';
     
     // === FEED PROGRESS BAR ===
     const feedFill = document.getElementById('feedProgressFill');
     const feedText = document.getElementById('feedProgressText');
-    if (feedFill) feedFill.style.width = (state.hunger * fillPercentage) + '%';
-    if (feedText) feedText.textContent = state.hunger + '/10';
+    if (feedFill) feedFill.style.width = (state.feed * fillPercentage) + '%';
+    if (feedText) feedText.textContent = state.feed + '/10';
     
     // === COMPETITION PROGRESS BAR ===
     const competitionFill = document.getElementById('competitionProgressFill');
     const competitionText = document.getElementById('competitionProgressText');
-    if (competitionFill) competitionFill.style.width = (state.hunger * fillPercentage) + '%';
-    if (competitionText) competitionText.textContent = state.hunger + '/10';
+    if (competitionFill) competitionFill.style.width = (state.feed * fillPercentage) + '%';
+    if (competitionText) competitionText.textContent = state.feed + '/10';
 }
 
 /**
@@ -476,11 +499,11 @@ let lastNeedsList = [];
 
 // Messages the pet says based on what it needs
 const needMessages = {
-    'energy': 'I need rest',      // Pet needs energy
-    'hunger': 'Feed me',           // Pet is hungry
-    'happiness': 'Lets play!',     // Pet is bored
-    'cleanliness': 'Clean me',     // Pet is dirty
-    'health': 'Achooo*'            // Pet is sick
+    'feed': 'Feed me',             // Pet is hungry
+    'play': 'Let\'s play!',        // Pet wants to play
+    'health': 'Achooo*',           // Pet is sick
+    'clean': 'Clean me',           // Pet is dirty
+    'rest': 'I need rest'          // Pet is tired
 };
 
 /**
@@ -503,16 +526,16 @@ function updatePetImageBasedOnStatsHome() {
     // Check which stats are below 4 (critical/sad)
     const belowFour = [];
     if (state.health < 4) belowFour.push('health');
-    if (state.hunger < 4) belowFour.push('hunger');
-    if (state.happiness < 4) belowFour.push('happiness');
-    if (state.cleanliness < 4) belowFour.push('cleanliness');
+    if (state.feed < 4) belowFour.push('feed');
+    if (state.rest < 4) belowFour.push('rest');
+    if (state.clean < 4) belowFour.push('clean');
     
     // Check which stats are 4-6 (normal range)
     const normalRange = [];
     if (state.health >= 4 && state.health <= 6) normalRange.push('health');
-    if (state.hunger >= 4 && state.hunger <= 6) normalRange.push('hunger');
-    if (state.happiness >= 4 && state.happiness <= 6) normalRange.push('happiness');
-    if (state.cleanliness >= 4 && state.cleanliness <= 6) normalRange.push('cleanliness');
+    if (state.feed >= 4 && state.feed <= 6) normalRange.push('feed');
+    if (state.rest >= 4 && state.rest <= 6) normalRange.push('rest');
+    if (state.clean >= 4 && state.clean <= 6) normalRange.push('clean');
     
     // Start with 'normal' mood and empty needs list
     let mood = 'normal';
@@ -524,7 +547,7 @@ function updatePetImageBasedOnStatsHome() {
         needsList = belowFour;
     }
     // PRIORITY 2: If ALL stats above 7, show happy pet
-    else if (state.play >= 7 && state.hunger >= 7 && state.happiness >= 7 && state.cleanliness >= 7 && state.health >= 7) {
+    else if (state.play >= 7 && state.feed >= 7 && state.rest >= 7 && state.clean >= 7 && state.health >= 7) {
         mood = 'happy';
         needsList = [];
     }
@@ -578,22 +601,22 @@ function updatePetImageBasedOnStatsAction(actionName) {
     // Get the stat value affected by this action
     switch(actionName) {
         case 'play':
-            statValue = state.happiness;
+            statValue = state.play;
             break;
         case 'rest':
-            statValue = state.health;
+            statValue = state.rest;
             break;
         case 'feed':
-            statValue = state.hunger;
+            statValue = state.feed;
             break;
         case 'clean':
-            statValue = state.cleanliness;
+            statValue = state.clean;
             break;
         case 'vet':
             statValue = state.health;
             break;
         case 'competition':
-            statValue = state.hunger;
+            statValue = state.feed;
             break;
     }
     
@@ -926,12 +949,12 @@ function checkCompetitionRequirements() {
     const state = getGameState();
     
     // Check each requirement
-    const hungerOk = state.hunger > 4;  // Pet must not be hungry
+    const feedOk = state.feed > 4;      // Pet must be well fed
     const healthOk = state.health > 4;  // Pet must be healthy
     
     // If any requirement not met, show alert and return false
-    if (!hungerOk || !healthOk) {
-        alert(`Your pet is not ready for competition!\n\nCurrent Stats:\nHunger: ${state.hunger}/10 ${hungerOk ? '✓' : '✗ (need >4)'}\nHealth: ${state.health}/10 ${healthOk ? '✓' : '✗ (need >4)'}`);
+    if (!feedOk || !healthOk) {
+        alert(`Your pet is not ready for competition!\n\nCurrent Stats:\nFeed: ${state.feed}/10 ${feedOk ? '✓' : '✗ (need >4)'}\nHealth: ${state.health}/10 ${healthOk ? '✓' : '✗ (need >4)'}`);
         return false;
     }
     
@@ -982,7 +1005,7 @@ function startGame() {
     
     // Determine which pet image to show based on average stats
     let imageSrc = 'images/normal_' + petType + '.png';
-    const avgStat = (state.hunger + state.play + state.health + state.happiness + state.cleanliness) / 5;
+    const avgStat = (state.feed + state.play + state.health + state.rest + state.clean) / 5;
     
     // Show happy pet if average stat is high
     if (avgStat >= 8) {
@@ -1204,7 +1227,7 @@ function endGame() {
     
     // Deduct stats due to exertion from competition (only if player earned money)
     if (gameData.money > 0) {
-        state.hunger = clampStat(state.hunger - 2);  // Hunger -2 (pet gets hungry from competing)
+        state.feed = clampStat(state.feed - 2);      // Feed -2 (pet gets hungry from competing)
         state.rest = clampStat(state.rest - 2);      // Rest -2 (pet gets tired from competing)
     }
     
