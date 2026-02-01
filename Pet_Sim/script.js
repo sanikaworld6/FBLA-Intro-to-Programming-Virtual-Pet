@@ -271,7 +271,7 @@ function performAction(actionName) {
         'play': 0,      // Free action
         'feed': 10,     // Costs $10
         'clean': 5,     // Costs $5
-        'rest': Math.floor(Math.random() * 6),  // Costs $0-$5 (random)
+        'rest': 0,      // Free action
         'vet': 50       // Costs $50
     };
     
@@ -1202,10 +1202,11 @@ function endGame() {
     // Get current game state
     const state = getGameState();
     
-    // Deduct stats due to exertion from competition
-    state.play = clampStat(state.play - 3);          // Play -3
-    state.hunger = clampStat(state.hunger - 2);      // Hunger -2
-    state.cleanliness = clampStat(state.cleanliness - 2); // Cleanliness -2
+    // Deduct stats due to exertion from competition (only if player earned money)
+    if (gameData.money > 0) {
+        state.hunger = clampStat(state.hunger - 2);  // Hunger -2 (pet gets hungry from competing)
+        state.rest = clampStat(state.rest - 2);      // Rest -2 (pet gets tired from competing)
+    }
     
     // Add winnings from the game
     state.money += gameData.money;
