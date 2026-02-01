@@ -8,53 +8,54 @@
 </head>
 <body>
     <h1 class="toys-title">Pet Toys</h1>
+    <div class="toys-balance">Balance: $<span id="toysMoneyDisplay">0</span></div>
 
     <div class="toys-container">
         <!-- First row of 3 toys -->
         <div class="toys-row">
-            <div class="toy-item">
+            <div class="toy-item" data-toy-id="1">
                 <div class="toy-rectangle">
-                    <div class="toy-placeholder">Toy 1<br>Coming Soon</div>
+                    <img src="images/carrots.png" alt="Carrots" class="toy-image">
                 </div>
-                <button class="buy-btn" data-toy="1" data-price="20" onclick="buyToy(1, 20)">Buy - $20</button>
+                <button class="buy-btn" data-toy="1" data-price="15">Buy - $15</button>
             </div>
 
-            <div class="toy-item">
+            <div class="toy-item" data-toy-id="2">
                 <div class="toy-rectangle">
-                    <div class="toy-placeholder">Toy 2<br>Coming Soon</div>
+                    <img src="images/pet-ball.png" alt="Ball" class="toy-image">
                 </div>
-                <button class="buy-btn" data-toy="2" data-price="25" onclick="buyToy(2, 25)">Buy - $25</button>
+                <button class="buy-btn" data-toy="2" data-price="20">Buy - $20</button>
             </div>
 
-            <div class="toy-item">
+            <div class="toy-item" data-toy-id="3">
                 <div class="toy-rectangle">
-                    <div class="toy-placeholder">Toy 3<br>Coming Soon</div>
+                    <img src="images/circle-toy.png" alt="Circle Toy" class="toy-image">
                 </div>
-                <button class="buy-btn" data-toy="3" data-price="30" onclick="buyToy(3, 30)">Buy - $30</button>
+                <button class="buy-btn" data-toy="3" data-price="25">Buy - $25</button>
             </div>
         </div>
 
         <!-- Second row of 3 toys -->
         <div class="toys-row">
-            <div class="toy-item">
+            <div class="toy-item" data-toy-id="4">
                 <div class="toy-rectangle">
-                    <div class="toy-placeholder">Toy 4<br>Coming Soon</div>
+                    <img src="images/yarn.png" alt="Yarn" class="toy-image">
                 </div>
-                <button class="buy-btn" data-toy="4" data-price="35" onclick="buyToy(4, 35)">Buy - $35</button>
+                <button class="buy-btn" data-toy="4" data-price="30">Buy - $30</button>
             </div>
 
-            <div class="toy-item">
+            <div class="toy-item" data-toy-id="5">
                 <div class="toy-rectangle">
-                    <div class="toy-placeholder">Toy 5<br>Coming Soon</div>
+                    <img src="images/dog-bone.png" alt="Bone" class="toy-image">
                 </div>
-                <button class="buy-btn" data-toy="5" data-price="40" onclick="buyToy(5, 40)">Buy - $40</button>
+                <button class="buy-btn" data-toy="5" data-price="40">Buy - $40</button>
             </div>
 
-            <div class="toy-item">
+            <div class="toy-item" data-toy-id="6">
                 <div class="toy-rectangle">
-                    <div class="toy-placeholder">Toy 6<br>Coming Soon</div>
+                    <img src="images/dog-toy.png" alt="Premium Toy" class="toy-image">
                 </div>
-                <button class="buy-btn" data-toy="6" data-price="45" onclick="buyToy(6, 45)">Buy - $45</button>
+                <button class="buy-btn" data-toy="6" data-price="55">Buy - $55</button>
             </div>
         </div>
     </div>
@@ -64,45 +65,128 @@
 
     <script src="script.js"></script>
     <script>
+        // Toy image mappings
+        const toyImages = {
+            1: 'images/carrots.png',
+            2: 'images/pet-ball.png',
+            3: 'images/circle-toy.png',
+            4: 'images/yarn.png',
+            5: 'images/dog-bone.png',
+            6: 'images/dog-toy.png'
+        };
+
         // Function to handle toy purchase
-        function buyToy(toyNumber, price) {
+        function buyToy(toyId, price) {
             const state = getGameState();
             
+            // Initialize toys array if it doesn't exist
+            if (!state.ownedToys) {
+                state.ownedToys = [];
+            }
+            
+            // Check if already owned
+            if (state.ownedToys.includes(toyId)) {
+                // If already owned, select it as active
+                state.activeToy = toyId;
+                saveGameState(state);
+                alert('Toy equipped!');
+                updateToysDisplay();
+                return;
+            }
+            
+            // Check if can afford
             if (state.money >= price) {
                 // Deduct money
                 state.money -= price;
+                // Add to owned toys
+                state.ownedToys.push(toyId);
+                // Set as active toy
+                state.activeToy = toyId;
                 saveGameState(state);
                 
-                // Show success message
-                alert(`Successfully purchased Toy ${toyNumber} for $${price}!`);
-                
-                // Update display if needed (for future implementation)
+                alert(`Toy purchased and equipped for $${price}!`);
+                updateToysDisplay();
             } else {
-                // Not enough money
                 alert(`Not enough money! You need $${price} but only have $${state.money}.`);
             }
         }
 
-        // Update button states based on available money
-        function updateBuyButtons() {
+        // Update display based on owned toys and money
+        function updateToysDisplay() {
             const state = getGameState();
-            const buttons = document.querySelectorAll('.buy-btn');
+            const ownedToys = state.ownedToys || [];
+            const activeToy = state.activeToy || null;
             
-            buttons.forEach(button => {
+            // Update money display
+            const moneyDisplay = document.getElementById('toysMoneyDisplay');
+            if (moneyDisplay) {
+                moneyDisplay.textContent = state.money;
+            }
+            
+            // Update each toy item
+            document.querySelectorAll('.toy-item').forEach(item => {
+                const toyId = parseInt(item.dataset.toyId);
+                const button = item.querySelector('.buy-btn');
                 const price = parseInt(button.dataset.price);
-                if (state.money < price) {
-                    button.disabled = true;
-                    button.classList.add('insufficient-funds');
+                const rectangle = item.querySelector('.toy-rectangle');
+                const image = item.querySelector('.toy-image');
+                
+                // Check if owned
+                const isOwned = ownedToys.includes(toyId);
+                const isActive = activeToy === toyId;
+                const canAfford = state.money >= price;
+                
+                if (isOwned) {
+                    // Owned - change button to "Equip" or "Equipped"
+                    if (isActive) {
+                        button.textContent = 'Equipped';
+                        button.disabled = true;
+                        button.classList.add('equipped');
+                        button.classList.remove('insufficient-funds');
+                        rectangle.style.border = '4px solid #FFD700';
+                        image.style.filter = 'grayscale(0%)';
+                        image.style.opacity = '1';
+                    } else {
+                        button.textContent = 'Equip';
+                        button.disabled = false;
+                        button.classList.remove('equipped', 'insufficient-funds');
+                        rectangle.style.border = '2px solid #ccc';
+                        image.style.filter = 'grayscale(0%)';
+                        image.style.opacity = '1';
+                    }
                 } else {
-                    button.disabled = false;
-                    button.classList.remove('insufficient-funds');
+                    // Not owned - show buy button
+                    button.textContent = `Buy - $${price}`;
+                    rectangle.style.border = '2px solid #ccc';
+                    
+                    if (!canAfford) {
+                        button.disabled = true;
+                        button.classList.add('insufficient-funds');
+                        button.classList.remove('equipped');
+                        image.style.filter = 'grayscale(100%)';
+                        image.style.opacity = '0.5';
+                    } else {
+                        button.disabled = false;
+                        button.classList.remove('insufficient-funds', 'equipped');
+                        image.style.filter = 'grayscale(0%)';
+                        image.style.opacity = '1';
+                    }
                 }
             });
         }
 
+        // Add click handlers to all buy buttons
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const toyId = parseInt(this.dataset.toy);
+                const price = parseInt(this.dataset.price);
+                buyToy(toyId, price);
+            });
+        });
+
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', function() {
-            updateBuyButtons();
+            updateToysDisplay();
         });
     </script>
 </body>

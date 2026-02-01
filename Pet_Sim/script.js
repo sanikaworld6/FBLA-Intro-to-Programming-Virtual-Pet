@@ -624,6 +624,42 @@ function updateMoneyDisplay() {
     }
 }
 
+/**
+ * updateActiveToyDisplay() - Display active toy next to pet on Home page
+ * Shows the toy the player currently has equipped
+ */
+function updateActiveToyDisplay() {
+    const activeToyImage = document.getElementById('activeToyImage');
+    
+    if (activeToyImage) {
+        const state = getGameState();
+        
+        // Check if player has an active toy equipped
+        if (state.activeToy) {
+            // Map toy IDs to image paths (matching Toys.html)
+            const toyImages = {
+                1: 'images/carrots.png',
+                2: 'images/pet-ball.png',
+                3: 'images/circle-toy.png',
+                4: 'images/yarn.png',
+                5: 'images/dog-bone.png',
+                6: 'images/dog-toy.png'
+            };
+            
+            // Set the image source and make it visible
+            if (toyImages[state.activeToy]) {
+                activeToyImage.src = toyImages[state.activeToy];
+                activeToyImage.style.display = 'block';
+            } else {
+                activeToyImage.style.display = 'none';
+            }
+        } else {
+            // No active toy - hide the image
+            activeToyImage.style.display = 'none';
+        }
+    }
+}
+
 // ============================================================
 // SECTION 7: PET IMAGE & MOOD SYSTEM
 // ============================================================
@@ -700,13 +736,21 @@ function updatePetImageBasedOnStatsHome() {
     
     // Update speech bubble based on needs
     if (needsList.length > 0) {
-        // Only update speech bubble if needs changed
-        if (JSON.stringify(needsList) !== JSON.stringify(lastNeedsList)) {
-            // Pick a random stat from the needs list to display
-            let randomIndex = Math.floor(Math.random() * needsList.length);
-            speechBubble.textContent = needMessages[needsList[randomIndex]];
-            lastNeedsList = [...needsList];
+        // Find the lowest stat from the needs list
+        let lowestStat = needsList[0];
+        let lowestValue = state[lowestStat];
+        
+        for (let stat of needsList) {
+            if (state[stat] < lowestValue) {
+                lowestValue = state[stat];
+                lowestStat = stat;
+            }
         }
+        
+        // Always show the lowest stat's message
+        speechBubble.textContent = needMessages[lowestStat];
+        lastNeedsList = [...needsList];
+        
         // Show the speech bubble
         speechBubble.style.display = 'block';
     } else {
@@ -869,6 +913,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Load and display badges on home page
         loadBadges();
         displayBadges();
+        
+        // Display active toy next to pet
+        updateActiveToyDisplay();
     } else {
         // Stop stat decay when leaving home page
         stopStatDecay();

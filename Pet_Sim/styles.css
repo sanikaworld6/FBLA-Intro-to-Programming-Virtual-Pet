@@ -168,14 +168,28 @@ input[type="text"]:focus {
     letter-spacing: 2px;
 }
 
+.pet-display-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin: 20px auto 0;
+}
+
 #petImage {
-    max-width: 350px;
-    max-height: 350px;
+    max-width: 300px;
+    max-height: 300px;
     width: 100%;
     height: auto;
     border-radius: 20px;
-    display: block;
-    margin: 20px auto 0;
+    object-fit: contain;
+}
+
+#activeToyImage {
+    max-width: 150px;
+    max-height: 150px;
+    width: 100%;
+    height: auto;
     object-fit: contain;
 }
 
@@ -838,6 +852,20 @@ input[type="text"]:focus {
     font-family: 'Maiandra GD', sans-serif;
 }
 
+.toys-balance {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    font-size: 24px;
+    font-weight: 600;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
 .toys-row {
     display: flex;
     gap: 30px;
@@ -856,7 +884,7 @@ input[type="text"]:focus {
     width: 250px;
     height: 250px;
     background-color: white;
-    border: 3px solid hsl(196, 99%, 50%);
+    border: 2px solid #ccc;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     display: flex;
@@ -867,15 +895,16 @@ input[type="text"]:focus {
 }
 
 .toy-rectangle:hover {
-    border-color: #001a4d;
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
-.toy-rectangle img {
+.toy-image {
     max-width: 100%;
     max-height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    padding: 10px;
 }
 
 .toy-placeholder {
@@ -899,14 +928,25 @@ input[type="text"]:focus {
     white-space: nowrap;
 }
 
-.buy-btn:hover {
+.buy-btn:hover:not(:disabled) {
     border-color: #001a4d;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.buy-btn:active {
+.buy-btn:active:not(:disabled) {
     transform: translateY(0);
+}
+
+.buy-btn.insufficient-funds {
+    background-color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.buy-btn.equipped {
+    background-color: #4CAF50;
+    cursor: default;
 }
 
 .buy-btn:disabled {
