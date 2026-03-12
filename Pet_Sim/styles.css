@@ -871,7 +871,7 @@ input[type="text"]:focus {
 .qa-answer-box.active {
     background: rgba(102, 126, 234, 0.2);
     border-color: rgba(102, 126, 234, 0.5);
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(0, 0, 0, 0.95);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
@@ -1425,4 +1425,183 @@ input[type="text"]:focus {
 .win-popup .badge-popup-close:hover {
     background-color: #5568d3;
     transform: scale(1.05);
+}
+@media (max-width: 430px) {
+    body {
+        background-attachment: scroll;
+        background-position: center center;
+        background-size: cover;
+        padding: 12px;
+        min-height: 100vh;
+    }
+
+    h1 { 
+        font-size: 40px; 
+        margin-top: 10px; 
+        margin-bottom: 6px;
+        text-align: center;
+    }
+
+    /* FORCE all 3 into one row with flexbox wrapper */
+    .total-box, .restart-btn, .end-game-btn {
+        position: static;
+        flex: 1;
+        font-size: 11px;
+        padding: 9px 4px;
+        text-align: center;
+        justify-content: center;
+        white-space: nowrap;
+        box-sizing: border-box;
+    }
+
+    .top-status-row {
+        width: 94% !important;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 16px;
+        margin-bottom: 10px !important;
+    }
+
+    /* Wrap the 3 buttons — inject a flex container via the h1 sibling */
+    .total-box {
+        order: 1;
+    }
+    .restart-btn {
+        order: 2;
+    }
+    .end-game-btn {
+        order: 3;
+    }
+
+    /* Row 2: Q&A, Toy Purchase, Help */
+    .top-buttons {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+        width: 94%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 14px;
+        margin-bottom: 10px;
+        padding: 0;
+    }
+
+  .top-buttons .qa-btn {
+        font-size: 12px;
+        padding: 10px 4px;
+        text-align: center;
+        width: 100%;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .home-container {
+        flex-direction: column;
+        margin-top: 0;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 2px;
+        padding: 0;
+        width: 94%;
+        min-height: calc(100vh - 280px);
+    }
+    /* Pet centered and large */
+    .center-box {
+        width: 96%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        order: -1;
+    }
+
+    .pet-name-box {
+        padding: 8px;
+        text-align: center;
+        width: 82%;
+    }
+
+    .pet-name-box h2 { 
+        font-size: 22px; 
+        margin-bottom: 6px;
+    }
+
+    #petImage { 
+        max-width: 156px;
+        max-height: 156px;
+    }
+
+    .speech-bubble {
+        font-size: 16px;
+        padding: 6px 12px;
+        top: -46px;
+        white-space: nowrap;
+    }
+
+    /* 6 action buttons in 2 rows of 3 */
+    .side-buttons {
+        width: 96%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        column-gap: 6px;
+        row-gap: 10px;
+        transform: translateY(-30px);
+    }
+
+    .button-with-progress {
+        width: calc(33.3% - 8px);
+    }
+
+    .action-btn {
+        width: 100%;
+        font-size: 10px;
+        padding: 9px 3px;
+        white-space: normal;
+        text-align: center;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .button-progress-bar { height: 10px; }
+
+    /* Achievements pinned to bottom */
+    .achievements-section {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 94%;
+        margin: 0;
+        padding: 8px 6px;
+        border-radius: 12px 12px 0 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+    }
+
+    .achievements-section h2 {
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .badge-container {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 3px;
+        padding: 2px;
+    }
+
+    .badge-card {
+        width: 52px;
+        height: 64px;
+        padding: 4px;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+    .badge-icon { font-size: 18px; margin-bottom: 2px; }
+    .badge-title { font-size: 7px; margin-bottom: 1px; }
+    .badge-description { font-size: 6px; }
 }
